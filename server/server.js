@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './src/modules/auth/route/authRoutes.js'
+import managerprofileRoutes from './src/modules/manager/routes/profileRoutes.js';
 dotenv.config();
 // Initialize Express app
 const app = express();
@@ -18,6 +19,7 @@ connectDB();
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/manager', managerprofileRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
