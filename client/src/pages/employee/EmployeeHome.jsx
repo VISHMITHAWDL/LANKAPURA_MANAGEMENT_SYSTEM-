@@ -1,8 +1,12 @@
 import React from 'react'
+import Sidebar from '../../components/employee/SideBar';
 
 const EmployeeHome = () => {
   return (
-    <div>EmployeeHome</div>
+    <div className="w-full">
+      <Sidebar />
+
+    </div>
   )
 }
 
