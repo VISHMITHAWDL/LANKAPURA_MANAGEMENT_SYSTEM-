@@ -130,10 +130,10 @@ const SideBar = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFBF7] text-[#1F2A33] flex">
+    <div className="h-screen bg-[#FAFBF7] text-[#1F2A33] flex">
       {/* Sidebar */}
-      <div className="w-70 bg-white shadow-xl border-r border-[#E7EAE3] relative">
-        <div className="p-6">
+      <div className="w-70 bg-white shadow-xl border-r border-[#E7EAE3] h-screen flex flex-col overflow-hidden">
+        <div className="p-6 flex-1 overflow-y-auto">
           <div className="flex items-center mb-8">
             <div className="w-13 h-13 bg-gradient-to-br from-[#2E7D32] to-[#81C784] rounded-lg flex items-center justify-center mr-3">
               <img src={Logo} alt="Logo" className="w-8 h-8" />
@@ -173,7 +173,7 @@ const SideBar = () => {
           </nav>
         </div>
 
-        <div className="absolute bottom-0 w-64 p-6 border-t border-[#E7EAE3]">
+  <div className="p-6 border-t border-[#E7EAE3]">
           <button className="w-full flex items-center px-4 py-3 rounded-xl text-[#B23B3B] hover:bg-red-50 transition-all duration-200">
             <LogOut size={20} className="mr-3" />
             <span className="font-medium">Logout</span>
@@ -182,7 +182,7 @@ const SideBar = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-8 overflow-y-auto">
+  <div className="flex-1 h-screen p-8 overflow-y-auto">
         {renderContent()}
       </div>
     </div>

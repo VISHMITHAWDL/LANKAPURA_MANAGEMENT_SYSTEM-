@@ -4,11 +4,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './src/modules/auth/route/authRoutes.js'
 import managerprofileRoutes from './src/modules/manager/routes/profileRoutes.js';
+import employeeProfileRoutes from './src/modules/employee/routes/employeeProfileRoutes.js';
+
 dotenv.config();
 // Initialize Express app
 const app = express();
 // Set the port from environment variable or default to 3001
 const PORT = process.env.PORT || 3001;
+
 
 // Middleware
 app.use(cors());
@@ -20,6 +23,7 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/manager', managerprofileRoutes);
+app.use('/api/employee', employeeProfileRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
