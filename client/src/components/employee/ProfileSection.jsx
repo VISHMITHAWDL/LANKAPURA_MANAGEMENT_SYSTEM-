@@ -13,94 +13,90 @@ import {
 import Uploadphoto from '../../assets/upload_area.png';
 import RemoveProfile from '../../assets/dustbin.png';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 
 // import profileApi from '../../apis/employee/profileApi';
 
 const Profile = () => {
 
-  const [profile, setProfile] = useState(null); // image file
+  const [profileImage, setProfileImage] = useState(null); // image file
   const [isEdit, setIsEdit] = useState(false);
-  
+  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [nic, setNic] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [role, setRole] = useState('employee');
+  const [isActive, setIsActive] = useState(true);
+  const [gender, setGender] = useState('Male');
+  const [jobtitle, setJobtitle] = useState('');
 
-  
-  const [form, setForm] = useState({
-    username: '',
-    fullName: '',
-    nic: '',
-    jobtitle: '',
-    gender: 'Male',
-    role: 'employee',
-    email: '',
-    phoneNumber: '',
-    address: '',
-    profileImage: profile,
-    dateOfBirth: '',
-    joinDate: '',
-    // skills: [],
-    // experience: [],
-    // certifications: [],
-    // emergencyContact: { name: '', relationship: '', phone: '' },
-    isActive: true,
-    // qualifications: []
-    });
-  const [originalForm, setOriginalForm] = useState(form);
 
   const onEdit = () => {
     setIsEdit(!isEdit);
-    setOriginalForm(form);
+  
   };
   const token = useSelector((s) => s.auth.token);
 
   const onCancel = () => {
     setIsEdit(false);
-    setForm(originalForm);
+ 
   };
 
   const onSave = async (e) => {
     e.preventDefault();
-    const fd = new FormData();
-    // Append all fields except ones we remap or file placeholder
-    Object.keys(form).forEach((key) => {
-      if (['jobTitle', 'profileImage'].includes(key)) return;
-      fd.append(key, form[key]);
-    });
-    // Map frontend jobTitle -> backend jobtitle
-    fd.append('jobtitle', form.jobTitle || '');
-    // Append file if selected
-    if (profile) {
-      fd.append('profileImage', profile);
-    }
-    setOriginalForm(form);
-  // const api = profileApi();
+    try {
+    const formData = new FormData();
 
-  try {
-    const res = await axios.post('/api/employee/create-profile', fd, {
+    formData.append('username', username);
+    formData.append('fullName', fullName);
+    formData.append('nic', nic);
+    formData.append('email', email);
+    formData.append('phoneNumber', phoneNumber);
+    formData.append('address', address);
+    formData.append('dateOfBirth', dateOfBirth);
+    formData.append('role', role);
+    formData.append('isActive', isActive);
+    formData.append('gender', gender);
+    formData.append('jobtitle', jobtitle);
+    if (profileImage) {
+      formData.append('profileImage', profileImage);
+    }
+  const response = await axios.post('http://localhost:3000/api/employee/create-profile', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${token}`
       }
     });
-    console.log('Profile saved:', res);
-  
+
+  // if (response.status >= 200 && response.status < 300) {
+  if (response.status === 201) {
+      console.log('Profile created successfully:', response.data);
+      toast.success('Profile created successfully!');
+    } else {
+      console.error('Error creating profile:', response);
+      toast.error('Failed to create profile. Please try again.');
+    }
   } catch (error) {
-    console.error('Error saving profile:', error);
-   
+    console.error('Error creating profile:', error);
+    toast.error('Failed to create profile. Please try again.');
   }
-
-
   setIsEdit(false);
-    
+
+
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setForm((prev) => ({ ...prev, [name]: value }));
+  // };
 
   const handleRemoveProfile = () => {
-    setProfile(null);
-    const fileInput = document.getElementById('Profile');
+    setProfileImage(null);
+    const fileInput = document.getElementById('profileImage');
     if (fileInput) {
       fileInput.value = '';
     }
@@ -202,9 +198,7 @@ const Profile = () => {
   //     emergencyContact: { ...(prev.emergencyContact || {}), [name]: value }
   //   }));
   // };
-  const toggleActive = () => {
-    setForm(prev => ({ ...prev, isActive: !prev.isActive }));
-  };
+
 
   return (
     <div className="w-full">
@@ -233,11 +227,11 @@ const Profile = () => {
             <label htmlFor='Profile' className="cursor-pointer">
                 <img 
                   className='w-20 h-20 rounded-full object-cover border-2 border-[#CDE7CF] hover:border-[#81C784] transition-all duration-300' 
-                  src={!profile ? Uploadphoto : URL.createObjectURL(profile)} 
+                  src={!profileImage ? Uploadphoto : URL.createObjectURL(profileImage)} 
                   alt=""
                 />
                 <input 
-                  onChange={(e)=>setProfile(e.target.files[0])} 
+                  onChange={(e)=>setProfileImage(e.target.files[0])} 
                   disabled={!isEdit}
                   type="file" 
                   id='Profile' 
@@ -245,7 +239,7 @@ const Profile = () => {
                   hidden 
                 />
             </label>
-            {profile && (
+            {profileImage && (
               <button
                 onClick={handleRemoveProfile}
                 disabled={!isEdit}
@@ -270,42 +264,42 @@ const Profile = () => {
               <Mail className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">User name</p>
-                <input name="username" value={form.username} onChange={handleChange} disabled={!isEdit} placeholder='Enter your user name' className="font-medium border rounded-lg px-3 py-2 w-full" required />
+                <input name="username" value={username} onChange={(e) => setUsername(e.target.value)} disabled={!isEdit} placeholder='Enter your user name' className="font-medium border rounded-lg px-3 py-2 w-full" required />
               </div>
             </div>
             <div className="flex items-center">
               <Mail className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Full name</p>
-                <input name="fullName" value={form.fullName} onChange={handleChange} disabled={!isEdit} placeholder='Enter your full name' className="font-medium border rounded-lg px-3 py-2 w-full" required/>
+                <input name="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={!isEdit} placeholder='Enter your full name' className="font-medium border rounded-lg px-3 py-2 w-full" required/>
               </div>
             </div>
             <div className="flex items-center">
               <Mail className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">NIC</p>
-                <input name="nic" value={form.nic} onChange={handleChange} disabled={!isEdit} placeholder='Enter your NIC' className="font-medium border rounded-lg px-3 py-2 w-full" required />
+                <input name="nic" value={nic} onChange={(e) => setNic(e.target.value)} disabled={!isEdit} placeholder='Enter your NIC' className="font-medium border rounded-lg px-3 py-2 w-full" required />
               </div>
             </div>
             <div className="flex items-center">
               <Mail className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Email</p>
-                <input type="email" name="email" value={form.email} onChange={handleChange} disabled={!isEdit} placeholder='Enter your email' className="font-medium border rounded-lg px-3 py-2 w-full" required />
+                <input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isEdit} placeholder='Enter your email' className="font-medium border rounded-lg px-3 py-2 w-full" required />
               </div>
             </div>
             <div className="flex items-center">
               <Phone className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Phone</p>
-                <input type="tel" name="phoneNumber" value={form.phoneNumber} onChange={handleChange} disabled={!isEdit} placeholder='Enter your phone number' className="font-medium border rounded-lg px-3 py-2 w-full" required />
+                <input type="tel" name="phoneNumber" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} disabled={!isEdit} placeholder='Enter your phone number' className="font-medium border rounded-lg px-3 py-2 w-full" required />
               </div>
             </div>
             <div className="flex items-center">
               <MapPin className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Address</p>
-                <input name="address" value={form.address} onChange={handleChange} disabled={!isEdit} placeholder='Enter your address' className="font-medium border rounded-lg px-3 py-2 w-full" />
+                <input name="address" value={address} onChange={(e) => setAddress(e.target.value)} disabled={!isEdit} placeholder='Enter your address' className="font-medium border rounded-lg px-3 py-2 w-full" />
               </div>
             </div>
           </div>
@@ -315,21 +309,21 @@ const Profile = () => {
               <Calendar className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Date of Birth</p>
-                <input type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} disabled={!isEdit} className="font-medium border rounded-lg px-3 py-2 w-full" />
+                <input type="date" name="dateOfBirth" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} disabled={!isEdit} className="font-medium border rounded-lg px-3 py-2 w-full" />
               </div>
             </div>
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <Calendar className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Join Date</p>
-                <input type="date" name="joinDate" value={form.joinDate} onChange={handleChange} disabled={!isEdit} className="font-medium border rounded-lg px-3 py-2 w-full" />
+                <input type="date" name="joinDate" value={joinDate} onChange={(e) => setJoinDate(e.target.value)} disabled={!isEdit} className="font-medium border rounded-lg px-3 py-2 w-full" />
               </div>
-            </div>
+            </div> */}
             <div className="flex items-center">
               <Calendar className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Role</p>
-                <select name="role" value={form.role} onChange={handleChange} disabled={!isEdit} className='font-medium border rounded-lg px-3 py-2 w-full'>
+                <select name="role" value={role} onChange={(e) => setRole(e.target.value)} disabled={!isEdit} className='font-medium border rounded-lg px-3 py-2 w-full'>
                   <option value="employee">employee</option>
                   <option value="manager">manager</option>
                   <option value="admin">admin</option>
@@ -340,7 +334,7 @@ const Profile = () => {
               <Calendar className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Gender</p>
-                <select name="gender" value={form.gender} onChange={handleChange} disabled={!isEdit} className='font-medium border rounded-lg px-3 py-2 w-full'>
+                <select name="gender" value={gender} onChange={(e) => setGender(e.target.value)} disabled={!isEdit} className='font-medium border rounded-lg px-3 py-2 w-full'>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                   <option value="Other">Other</option>
@@ -351,7 +345,7 @@ const Profile = () => {
               <Award className="text-[#A1887F] mr-3" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Job title</p>
-                <input name="jobTitle" value={form.jobTitle} onChange={handleChange} disabled={!isEdit} className="font-medium border rounded-lg px-3 py-2 w-full" required />
+                <input name="jobTitle" value={jobtitle} onChange={(e) => setJobtitle(e.target.value)} disabled={!isEdit} className="font-medium border rounded-lg px-3 py-2 w-full" required />
               </div>
             </div>
             
@@ -617,7 +611,7 @@ const Profile = () => {
             Status
           </h4>
           <label className="inline-flex items-center gap-2">
-            <input type="checkbox" checked={form.isActive} onChange={toggleActive} disabled={!isEdit} />
+            <input type="checkbox" checked={isActive} onChange={() => setIsActive(!isActive)} disabled={!isEdit} />
             <span className="text-sm text-gray-700">Active</span>
           </label>
         </div>
